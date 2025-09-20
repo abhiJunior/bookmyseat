@@ -16,7 +16,7 @@ import cors from "cors"
 
 const app = express();
 app.use(cors({
-  origin: "bookmyseat-frontend.vercel.app", // your React app origin
+  origin: "http://localhost:5173", // your React app origin
   credentials: true,               // allow cookies
 }));
 app.use(express.json())
