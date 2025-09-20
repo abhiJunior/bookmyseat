@@ -16,7 +16,7 @@ import dayjs from "dayjs";
 const { Option } = Select;
 
 const MovieTable = () => {
-  const url = "http://localhost:5000"
+  const url = "https://bookmyseat-backend.onrender.com"
   const [movies, setMovies] = useState([]);
   const [editing, setEditing] = useState(false);
   const [editingMovieId, setEditingMovieId] = useState(null);
