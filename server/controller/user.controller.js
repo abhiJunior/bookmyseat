@@ -68,9 +68,13 @@ export const profile = async(req,res)=>{
 export const logout = (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
-    secure: false,     // true in production with https
-    sameSite: "lax",  // must match what you set during login
-    path: "/"
+    secure: process.env.NODE_ENV === "production",   // must match login
+    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+    path: "/",                                       // must also match
   });
-  return res.status(200).send({ status: true, message: "Successfully logged out!" });
+
+  return res
+    .status(200)
+    .send({ status: true, message: "Successfully logged out!" });
 };
+
