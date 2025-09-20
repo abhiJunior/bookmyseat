@@ -3,7 +3,7 @@ import { useNavigate,Link } from "react-router-dom";
 import { useEffect } from "react";
 
 export default function Register() {
-  const url = "http://localhost:5000"
+  const url = "https://bookmyseat-backend.onrender.com"
   const [fullName,setfullName] = useState("")
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
