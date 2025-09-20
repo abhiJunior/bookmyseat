@@ -38,7 +38,7 @@ export const login = async(req,res)=>{
         const jwtToken = await validUser.generateJWTToken()
 
         // PUT JWT token in cookie
-        res.cookie("token", token, {
+        res.cookie("token", jwtToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production", 
           sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
