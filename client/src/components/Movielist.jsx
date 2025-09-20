@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import MovieCard from "./MovieCard";
+import Moviecard from "./Moviecard";
 import { Spin } from "antd";
 import Corousel from "./Corousel";
 
@@ -64,7 +64,7 @@ function Movielist() {
           {movies.map((movie) => (
             <Link to={`/movies/${movie._id}`} >
 
-              <MovieCard
+              <Moviecard
                 key={movie._id}
                 title={movie.title}
                 thumbnail={movie.thumbnail}
