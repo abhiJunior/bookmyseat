@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function UserProfile() {
-  const url = "http://localhost:5000"
+  const url = "https://bookmyseat-backend.onrender.com"
   const navigate = useNavigate();
   const [user, setUser] = useState({});
 
