@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Table, Space, Button, Modal, Form, Input, message } from "antd";
 
 const TheatreTable = () => {
-  const url = "http://localhost:5000"
+  const url = "https://bookmyseat-backend.onrender.com"
   const [theatre, setTheatre] = useState([]);
   const [editing, setEditing] = useState(false);
   const [editingTheatreId, setEditingTheatreId] = useState(null);
