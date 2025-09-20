@@ -13,9 +13,9 @@ export default function MovieCard({
   promoted,
 }) {
   return (
-    <div className="w-60 cursor-pointer">
+    <div className="w-full max-w-xs cursor-pointer">
       {/* Image + overlay */}
-      <div className="relative rounded-lg overflow-hidden shadow-md hover:shadow-xl transition duration-300">
+      <div className="relative rounded-lg overflow-hidden shadow-md hover:shadow-xl transition duration-300 aspect-[2/3]">
         {promoted && (
           <Tag
             color="red"
@@ -27,14 +27,14 @@ export default function MovieCard({
         <img
           src={thumbnail}
           alt={`${title} Thumbnail`}
-          className="w-full h-90 object-cover"
+          className="w-full h-full object-cover"
         />
 
         {/* Bottom overlay bar (rating / likes) */}
-        <div className="absolute bottom-0 w-full bg-black/70 text-white px-2 py-1 flex items-center justify-start space-x-2 text-xs">
+        <div className="absolute bottom-0 w-full bg-black/70 text-white px-2 py-1 flex items-center space-x-2 text-xs">
           {rating ? (
             <>
-              <StarFilled className="text-red-500 " />
+              <StarFilled className="text-red-500" />
               <span>{rating}/10</span>
               <span className="ml-1 opacity-80">{votes} Votes</span>
             </>
@@ -49,9 +49,11 @@ export default function MovieCard({
 
       {/* Title + details */}
       <div className="mt-2">
-        <h3 className="text-medium font-semibold truncate">{title}</h3>
+        <h3 className="text-sm font-semibold truncate">{title}</h3>
         <p className="text-xs text-gray-500">{certificate}</p>
-        <p className="text-xs text-gray-400 truncate">{languages?.join(", ")}</p>
+        <p className="text-xs text-gray-400 truncate">
+          {languages?.join(", ")}
+        </p>
       </div>
     </div>
   );

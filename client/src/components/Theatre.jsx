@@ -5,7 +5,7 @@ import { DatePicker } from "antd";
 import dayjs from "dayjs";
 
 function Theatre() {
-  const url = "https://bookmyseat-backend.onrender.com"
+  const url = "https://bookmyseat-backend.onrender.com";
   const [theatre, setTheatre] = useState([]);
   const [title, setTitle] = useState("");
   const [selectedDate, setSelectedDate] = useState(dayjs("2025-09-21")); // default 21-09-2025
@@ -42,49 +42,56 @@ function Theatre() {
   };
 
   return (
-    <>
-      
-      <div className="mb-6">
-        <h1 className="p-2 font-gilroy font-bold text-2xl mb-3">{title}</h1>
+    <div className="max-w-5xl mx-auto px-4 py-6">
+      {/* Movie title */}
+      <h1 className="font-gilroy font-bold text-2xl mb-4">{title}</h1>
 
-        {/* Ant Design DatePicker */}
+      {/* Ant Design DatePicker */}
+      <div className="mb-8">
         <DatePicker
           value={selectedDate}
           onChange={handleDateChange}
           disabledDate={disabledDate}
           format="YYYY-MM-DD"
-          className="border rounded px-3 py-2"
+          className="!w-full sm:!w-auto border rounded px-3 py-2"
         />
       </div>
+
+      {/* Theatre list */}
       {theatre.length > 0 ? (
-        <div className="flex flex-col gap-4">
-        {theatre.map((item) => (
-          <div
-            key={item._id}
-            className="flex border-3 border-sky-400 rounded items-center h-28"
-          >
-            <div className="w-1/3 font-bold font-gilroy text-lg text-slate-900 px-5">
-              {item.theatreDetails.name}
-            </div>
-            <div className="flex gap-5">
-              {item.shows.map((show) => (
-                <button
-                  key={show._id}
-                  type="button"
-                  className="border-2 border-green-500 p-3 px-4 font-gilroy font-medium text-slate-400 cursor-pointer"
-                >
-                  <Link to={`/show/${show._id}`}>
-                    {format(new Date(show.time), "hh:mm a")}
+        <div className="flex flex-col gap-6">
+          {theatre.map((item) => (
+            <div
+              key={item._id}
+              className="flex flex-col md:flex-row border-2 border-sky-400 rounded-lg p-4 md:items-center md:justify-between bg-white shadow-sm"
+            >
+              {/* Theatre name */}
+              <div className="font-bold font-gilroy text-lg text-slate-900 mb-3 md:mb-0">
+                {item.theatreDetails.name}
+              </div>
+
+              {/* Shows */}
+              <div className="flex flex-wrap gap-3">
+                {item.shows.map((show) => (
+                  <Link key={show._id} to={`/show/${show._id}`}>
+                    <button
+                      type="button"
+                      className="border-2 border-green-500 px-4 py-2 rounded-md font-gilroy font-medium text-slate-700 bg-white hover:bg-green-50 hover:text-green-600 transition"
+                    >
+                      {format(new Date(show.time), "hh:mm a")}
+                    </button>
                   </Link>
-                </button>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
-      ) :(<div>No Shows for Selected date</div>)}
-      
-    </>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center text-gray-500 py-10">
+          No Shows for selected date
+        </div>
+      )}
+    </div>
   );
 }
 

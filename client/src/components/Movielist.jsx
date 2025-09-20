@@ -5,16 +5,16 @@ import { Spin } from "antd";
 import Corousel from "./Corousel";
 
 function Movielist() {
-  const url = "https://bookmyseat-backend.onrender.com"
+  const url = "https://bookmyseat-backend.onrender.com";
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const fetchMoviesData = async () => {
     try {
-      const response = await fetch(`${url}/api/movie/list`,{
-        method:"GET",
-        credentials:"include"
+      const response = await fetch(`${url}/api/movie/list`, {
+        method: "GET",
+        credentials: "include",
       });
       if (!response.ok) {
         throw new Error("Failed to fetch movies");
@@ -58,29 +58,31 @@ function Movielist() {
 
   return (
     <>
-      <Corousel/>
+      <Corousel />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-slate-100 mt-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4    gap-8">
+        <div
+          className="
+            grid gap-6 sm:gap-8
+            grid-cols-1 sm:grid-cols-2 
+            md:grid-cols-3 lg:grid-cols-4
+            place-items-center
+          "
+        >
           {movies.map((movie) => (
-            <Link to={`/movies/${movie._id}`} >
-
+            <Link key={movie._id} to={`/movies/${movie._id}`} className="w-full flex justify-center">
               <Moviecard
-                key={movie._id}
                 title={movie.title}
                 thumbnail={movie.thumbnail}
                 rating={8.5}
                 votes="120K"
                 languages={["Japanese", "English", "Hindi"]}
                 certificate="UA13+"
-                
               />
-
             </Link>
           ))}
         </div>
-    </div>
+      </div>
     </>
-    
   );
 }
 

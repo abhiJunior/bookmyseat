@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Button, Card, Divider, Tag, message } from "antd";
 
 function Show() {
-  const url = "https://bookmyseat-backend.onrender.com"
-  const navigate = useNavigate()
+  const url = "https://bookmyseat-backend.onrender.com";
+  const navigate = useNavigate();
   const user = useSelector((state) => state.users.user);
+  const { showId } = useParams();
+
   const [show, setShow] = useState(null);
   const [selectedSeats, setSelectedSeats] = useState([]);
-  const { showId } = useParams();
   const [messageApi, contextHolder] = message.useMessage();
 
   const fetchShow = async () => {
@@ -22,7 +22,7 @@ function Show() {
       const res = await response.json();
       setShow(res);
     } catch (err) {
-      console.log(err.message)
+      console.error(err.message);
       messageApi.error("Failed to fetch show ❌");
     }
   };
@@ -31,7 +31,15 @@ function Show() {
     fetchShow();
   }, []);
 
+  const totalPrice = selectedSeats.reduce((acc, seat) => acc + seat.price, 0);
+
   const handlePayment = async () => {
+    if (!user) {
+      messageApi.warning("Please log in to continue");
+      navigate("/login");
+      return;
+    }
+
     try {
       const response = await fetch(`${url}/api/payment/order`, {
         method: "POST",
@@ -40,6 +48,10 @@ function Show() {
       });
 
       const order = await response.json();
+      if (!order?.id) {
+        messageApi.error("Failed to initiate payment ❌");
+        return;
+      }
 
       const options = {
         key: "rzp_test_RIGV80BFMlCwSf",
@@ -63,9 +75,8 @@ function Show() {
             }),
           });
 
-          messageApi.success("Payment Successful Seats booked!");
-          navigate("/booking")
-
+          messageApi.success("✅ Payment Successful! Seats booked");
+          navigate("/booking");
         },
         prefill: {
           name: user.fullName,
@@ -100,23 +111,25 @@ function Show() {
     }
   };
 
-  const totalPrice = selectedSeats.reduce((acc, seat) => acc + seat.price, 0);
-
   return (
     <>
       {contextHolder}
-      <div className="flex flex-col items-center">
-        <h3 className="mb-4 font-bold">🎬 Screen this side</h3>
+      <div className="flex flex-col items-center px-2 py-4 sm:px-4 sm:py-6">
+        <h3 className="mb-4 font-bold text-lg text-gray-700">🎬 Screen this side</h3>
 
+        {/* Seat categories */}
         {show?.seats?.map((item, idx) => (
           <Card
             key={idx}
             title={`Rs ${item.price} - ${item.category}`}
             bordered
-            className="w-full max-w-2xl mb-6"
+            className="w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-3xl mb-6 shadow-sm"
           >
             {item.arrangements.map((row, rIdx) => (
-              <div key={rIdx} className="flex gap-3 mt-2 justify-center">
+              <div
+                key={rIdx}
+                className="grid grid-cols-3 gap-2 sm:flex sm:gap-4 sm:justify-center mt-2"
+              >
                 {row.map((seat, sIdx) => {
                   const isSelected = selectedSeats.some(
                     (s) =>
@@ -138,6 +151,13 @@ function Show() {
                       onClick={() =>
                         handleSeatClick(seat, item.price, item.category)
                       }
+                      className={`min-w-[28px] sm:min-w-[40px] ${
+                        seat.status === "Booked"
+                          ? "bg-gray-200 text-gray-500"
+                          : isSelected
+                          ? "bg-blue-500 text-white"
+                          : "bg-white"
+                      }`}
                     >
                       {seat.seatNumber}
                     </Button>
@@ -148,18 +168,19 @@ function Show() {
           </Card>
         ))}
 
+        {/* Selected seats summary */}
         {selectedSeats.length > 0 && (
-          <Card className="w-full max-w-md text-center mt-6" bordered>
+          <Card className="w-full max-w-xs sm:max-w-md text-center mt-6 shadow-md" bordered>
             <h3 className="font-bold text-lg">Selected Seats</h3>
             <Divider />
-            <p>
+            <div className="flex flex-wrap gap-2 justify-center">
               {selectedSeats.map((s) => (
-                <Tag color="blue" key={s.seatNumber}>
-                  {s.seatNumber}
+                <Tag color="blue" key={`${s.category}-${s.seatNumber}`}>
+                  {s.category}-{s.seatNumber}
                 </Tag>
               ))}
-            </p>
-            <p className="font-medium mt-2">Total: Rs {totalPrice}</p>
+            </div>
+            <p className="font-medium mt-3">Total: Rs {totalPrice}</p>
 
             <Button
               type="primary"

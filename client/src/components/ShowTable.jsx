@@ -9,13 +9,14 @@ import {
   DatePicker,
   Select,
   message,
+  Image,
 } from "antd";
 import dayjs from "dayjs";
 
 const { Option } = Select;
 
 const ShowTable = () => {
-  const url = "https://bookmyseat-backend.onrender.com"
+  const url = "https://bookmyseat-backend.onrender.com";
   const [shows, setShows] = useState([]);
   const [movies, setMovies] = useState([]);
   const [theatres, setTheatres] = useState([]);
@@ -24,10 +25,10 @@ const ShowTable = () => {
   const [editingShowId, setEditingShowId] = useState(null);
   const [form] = Form.useForm();
 
-  // ✅ AntD message hook
+  // AntD message hook
   const [messageApi, contextHolder] = message.useMessage();
 
-  // Fetch Shows
+  // Fetch shows
   const fetchShows = async () => {
     try {
       const response = await fetch(`${url}/api/show/all`, {
@@ -35,7 +36,6 @@ const ShowTable = () => {
         credentials: "include",
       });
       if (!response.ok) throw new Error("Failed to fetch shows");
-
       const data = await response.json();
       setShows(data.map((show, idx) => ({ ...show, key: idx })));
     } catch (error) {
@@ -44,7 +44,7 @@ const ShowTable = () => {
     }
   };
 
-  // Fetch Movies
+  // Fetch movies
   const fetchMovies = async () => {
     try {
       const response = await fetch(`${url}/api/movie/list`, {
@@ -59,7 +59,7 @@ const ShowTable = () => {
     }
   };
 
-  // Fetch Theatres
+  // Fetch theatres
   const fetchTheatres = async () => {
     try {
       const response = await fetch(`${url}/api/theatre`, {
@@ -78,7 +78,7 @@ const ShowTable = () => {
     fetchShows();
   }, []);
 
-  // Open modal (fetch movies + theatres too)
+  // Open modal & fetch movies & theatres
   const openModal = (record = null) => {
     fetchMovies();
     fetchTheatres();
@@ -101,7 +101,7 @@ const ShowTable = () => {
     setIsModalVisible(true);
   };
 
-  // Table Columns
+  // Table columns
   const columns = [
     {
       title: "Movie",
@@ -151,7 +151,7 @@ const ShowTable = () => {
     },
   ];
 
-  // Handle Delete
+  // Delete Show
   const handleDelete = async (id) => {
     try {
       const response = await fetch(`${url}/api/show/${id}`, {
@@ -170,7 +170,7 @@ const ShowTable = () => {
     }
   };
 
-  // Handle Form Submit
+  // Form submit handler
   const handleFinish = async (values) => {
     try {
       const payload = {
@@ -178,13 +178,13 @@ const ShowTable = () => {
         time: values.time.toISOString(),
       };
 
-      const url = editing
+      const urlEndpoint = editing
         ? `${url}/api/show/${editingShowId}`
         : `${url}/api/show`;
 
       const method = editing ? "PUT" : "POST";
 
-      const response = await fetch(url, {
+      const response = await fetch(urlEndpoint, {
         method,
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -209,7 +209,6 @@ const ShowTable = () => {
 
   return (
     <div>
-      {/* ✅ Message container */}
       {contextHolder}
 
       {/* Add Show Button */}
@@ -219,7 +218,54 @@ const ShowTable = () => {
         </Button>
       </div>
 
-      <Table columns={columns} dataSource={shows} bordered />
+      {/* Mobile Card view */}
+      <div className="grid grid-cols-1 gap-4 p-2 md:hidden">
+        {shows.map((show) => (
+          <div
+            key={show._id}
+            className="bg-white p-4 rounded-lg shadow-md"
+          >
+            <div className="font-semibold text-lg mb-2">
+              {show.movie?.title || "No Title"}
+            </div>
+            <div className="mb-1">
+              <strong>Theatre:</strong> {show.theatre?.name} (
+              {show.theatre?.location})
+            </div>
+            <div className="mb-1">
+              <strong>Time:</strong> {dayjs(show.time).format("YYYY-MM-DD HH:mm")}
+            </div>
+            <div className="mb-1">
+              <strong>Language:</strong> {show.language}
+            </div>
+            <div className="mb-1">
+              <strong>Total Seats:</strong> {show.totalseats}
+            </div>
+            <div className="mb-3">
+              <strong>Available Seats:</strong> {show.availableseats}
+            </div>
+            <Space>
+              <Button type="primary" onClick={() => openModal(show)}>
+                Update
+              </Button>
+              <Button danger onClick={() => handleDelete(show._id)}>
+                Delete
+              </Button>
+            </Space>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop & Tablet Table view */}
+      <div className="hidden md:block">
+        <Table
+          columns={columns}
+          dataSource={shows}
+          bordered
+          scroll={{ x: "max-content" }}
+          pagination={{ pageSize: 10 }}
+        />
+      </div>
 
       {/* Add/Update Show Modal */}
       <Modal
@@ -234,7 +280,6 @@ const ShowTable = () => {
         footer={null}
       >
         <Form form={form} layout="vertical" onFinish={handleFinish}>
-          {/* Movie Select */}
           <Form.Item label="Movie" name="movie" rules={[{ required: true }]}>
             <Select placeholder="Select a movie">
               {movies.map((movie) => (
@@ -245,7 +290,6 @@ const ShowTable = () => {
             </Select>
           </Form.Item>
 
-          {/* Theatre Select */}
           <Form.Item label="Theatre" name="theatre" rules={[{ required: true }]}>
             <Select placeholder="Select a theatre">
               {theatres.map((theatre) => (
@@ -256,12 +300,10 @@ const ShowTable = () => {
             </Select>
           </Form.Item>
 
-          {/* Time Picker */}
           <Form.Item label="Time" name="time" rules={[{ required: true }]}>
             <DatePicker showTime style={{ width: "100%" }} />
           </Form.Item>
 
-          {/* Language */}
           <Form.Item label="Language" name="language" rules={[{ required: true }]}>
             <Select>
               <Option value="English">English</Option>
@@ -270,7 +312,6 @@ const ShowTable = () => {
             </Select>
           </Form.Item>
 
-          {/* Total Seats */}
           <Form.Item label="Total Seats" name="totalseats" rules={[{ required: true }]}>
             <Input type="number" />
           </Form.Item>

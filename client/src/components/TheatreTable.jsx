@@ -2,14 +2,14 @@ import React, { useEffect, useState } from "react";
 import { Table, Space, Button, Modal, Form, Input, message } from "antd";
 
 const TheatreTable = () => {
-  const url = "https://bookmyseat-backend.onrender.com"
+  const url = "https://bookmyseat-backend.onrender.com";
   const [theatre, setTheatre] = useState([]);
   const [editing, setEditing] = useState(false);
   const [editingTheatreId, setEditingTheatreId] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
 
-  // ✅ AntD message hook
+  // AntD message hook
   const [messageApi, contextHolder] = message.useMessage();
 
   // Fetch theatres
@@ -97,15 +97,15 @@ const TheatreTable = () => {
   // Add / Update theatre
   const handleSubmit = async (values) => {
     try {
-      let url = `${url}/api/theatre/`;
+      let urlEndpoint = `${url}/api/theatre/`;
       let method = "POST";
 
       if (editing) {
-        url += editingTheatreId;
+        urlEndpoint += editingTheatreId;
         method = "PUT";
       }
 
-      const response = await fetch(url, {
+      const response = await fetch(urlEndpoint, {
         method,
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -130,10 +130,8 @@ const TheatreTable = () => {
 
   return (
     <div>
-      {/* ✅ Message container */}
       {contextHolder}
 
-      {/* Top bar with Add Theatre button */}
       <div className="flex justify-end mb-4">
         <Button
           type="primary"
@@ -148,9 +146,15 @@ const TheatreTable = () => {
         </Button>
       </div>
 
-      <Table columns={columns} dataSource={theatre} bordered />
+      {/* Add horizontal scroll for table on small screens */}
+      <Table
+        columns={columns}
+        dataSource={theatre}
+        bordered
+        scroll={{ x: "max-content" }} // enable horizontal scroll for responsiveness
+        pagination={{ pageSize: 10 }}
+      />
 
-      {/* Add / Update Modal */}
       <Modal
         title={editing ? "Update Theatre" : "Add New Theatre"}
         open={isModalVisible}

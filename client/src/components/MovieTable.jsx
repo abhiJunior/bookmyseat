@@ -16,14 +16,14 @@ import dayjs from "dayjs";
 const { Option } = Select;
 
 const MovieTable = () => {
-  const url = "https://bookmyseat-backend.onrender.com"
+  const url = "https://bookmyseat-backend.onrender.com";
   const [movies, setMovies] = useState([]);
   const [editing, setEditing] = useState(false);
   const [editingMovieId, setEditingMovieId] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
 
-  // ✅ AntD message hook
+  // AntD message hook
   const [messageApi, contextHolder] = message.useMessage();
 
   // Fetch movies from backend
@@ -48,7 +48,7 @@ const MovieTable = () => {
     fetchMovies();
   }, []);
 
-  // Table Columns
+  // Table Columns with description trimming style
   const columns = [
     {
       title: "Title",
@@ -61,6 +61,15 @@ const MovieTable = () => {
       dataIndex: "description",
       key: "description",
       ellipsis: true,
+      width: 250,
+      onCell: () => ({
+        style: {
+          maxWidth: 250,
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        },
+      }),
     },
     {
       title: "Thumbnail",
@@ -145,18 +154,13 @@ const MovieTable = () => {
     try {
       let response;
       if (editing) {
-        // Update existing movie
-        response = await fetch(
-          `${url}/api/movie/${editingMovieId}`,
-          {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify(values),
-          }
-        );
+        response = await fetch(`${url}/api/movie/${editingMovieId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(values),
+        });
       } else {
-        // Add new movie
         response = await fetch(`${url}/api/movie/`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -167,9 +171,7 @@ const MovieTable = () => {
 
       if (response.ok) {
         messageApi.success(
-          editing
-            ? "Movie updated successfully ✅"
-            : "Movie added successfully ✅"
+          editing ? "Movie updated successfully ✅" : "Movie added successfully ✅"
         );
         setIsModalVisible(false);
         form.resetFields();
@@ -189,10 +191,8 @@ const MovieTable = () => {
 
   return (
     <div>
-      {/* ✅ Message container */}
       {contextHolder}
 
-      {/* Top bar with Add Movie button */}
       <div className="flex justify-end mb-4">
         <Button
           type="primary"
@@ -207,9 +207,53 @@ const MovieTable = () => {
         </Button>
       </div>
 
-      <Table columns={columns} dataSource={movies} bordered />
+      {/* Mobile Card view (hidden on md and above) */}
+      <div className="grid grid-cols-1 gap-4 p-2 md:hidden">
+        {movies.map((movie) => (
+          <div key={movie._id} className="bg-white p-4 rounded-lg shadow-md">
+            <div className="font-semibold text-lg mb-2">{movie.title}</div>
+            <Image
+              src={movie.thumbnail}
+              alt="thumbnail"
+              width={80}
+              height={80}
+              className="rounded-md object-cover mb-2"
+              preview={false}
+            />
+            <div className="text-sm mb-1">{movie.description}</div>
+            <div className="text-sm mb-1">
+              <strong>Genre:</strong> {movie.genre?.join(", ")}
+            </div>
+            <div className="text-sm mb-1">
+              <strong>Release Date:</strong>{" "}
+              {movie.releaseDate ? new Date(movie.releaseDate).toLocaleDateString() : "-"}
+            </div>
+            <div className="text-sm mb-3">
+              <strong>Languages:</strong> {movie.languages?.join(", ")}
+            </div>
+            <Space>
+              <Button type="primary" onClick={() => handleUpdate(movie)}>
+                Update
+              </Button>
+              <Button danger onClick={() => handleDelete(movie._id)}>
+                Delete
+              </Button>
+            </Space>
+          </div>
+        ))}
+      </div>
 
-      {/* Add / Update Movie Modal */}
+      {/* Desktop Table view (hidden on smaller screens) */}
+      <div className="hidden md:block">
+        <Table
+          columns={columns}
+          dataSource={movies}
+          bordered
+          scroll={{ x: "max-content" }}
+          pagination={{ pageSize: 10 }}
+        />
+      </div>
+
       <Modal
         title={editing ? "Update Movie" : "Add New Movie"}
         open={isModalVisible}
