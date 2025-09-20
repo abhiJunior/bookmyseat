@@ -1,6 +1,6 @@
 import { config } from "dotenv";
-config()
-import express from "express"
+config();
+import express from "express";
 import userRouter from "./routes/user.routes.js";
 import movieRouter from "./routes/movie.routes.js";
 import theatreRouter from "./routes/theatre.routes.js";
@@ -10,30 +10,37 @@ import connectTODB from "./congfig/DB_config.js";
 import bookingRouter from "./routes/booking.routes.js";
 
 import cookieParser from "cookie-parser";
-import cors from "cors"
-
-
+import cors from "cors";
 
 const app = express();
-app.use(cors({
-  origin: "https://bookmyseat-frontend.onrender.com", // your React app origin
-  credentials: true,               // allow cookies
-}));
-app.use(express.json())
 
-app.use(cookieParser())
+app.set("trust proxy", 1); // ✅ required for cookies on Render
 
-app.use("/api/user",userRouter)
-app.use("/api/movie",movieRouter)
-app.use("/api/show",showRouter)
-app.use("/api/theatre",theatreRouter)
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173", // dev
+      "https://bookmyseat-frontend.onrender.com", // deployed frontend
+    ],
+    credentials: true, // allow cookies
+  })
+);
+
+app.use(express.json());
+app.use(cookieParser());
+
+app.use("/api/user", userRouter);
+app.use("/api/movie", movieRouter);
+app.use("/api/show", showRouter);
+app.use("/api/theatre", theatreRouter);
 app.use("/api/payment", paymentRouter);
-app.use("/api/booking",bookingRouter)
-app.get("/ping",(req,res)=>{
-    res.status(200).send("Server is up and running")
-})
+app.use("/api/booking", bookingRouter);
 
-app.listen(5000,async()=>{
-    await connectTODB()
-    console.log("Server is running at http://localhost:5000")
-})
+app.get("/ping", (req, res) => {
+  res.status(200).send("Server is up and running");
+});
+
+app.listen(5000, async () => {
+  await connectTODB();
+  console.log("Server is running at http://localhost:5000");
+});
