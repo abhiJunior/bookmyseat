@@ -5,7 +5,7 @@ import { DatePicker } from "antd";
 import dayjs from "dayjs";
 
 function Theatre() {
-  const url = "http://localhost:5000"
+  const url = "https://bookmyseat-backend.onrender.com"
   const [theatre, setTheatre] = useState([]);
   const [title, setTitle] = useState("");
   const [selectedDate, setSelectedDate] = useState(dayjs("2025-09-21")); // default 21-09-2025
