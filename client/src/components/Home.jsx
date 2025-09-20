@@ -28,7 +28,7 @@ function classNames(...classes) {
 }
 
 export default function Home({ children, title }) {
-  const url = "http://localhost:5000"
+  const url = "https://bookmyseat-backend.onrender.com"
   const user = useSelector((state) => state.users.user);
   const navigate = useNavigate();
   const dispatch = useDispatch();
