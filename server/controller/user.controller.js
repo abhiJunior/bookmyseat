@@ -38,13 +38,13 @@ export const login = async(req,res)=>{
         const jwtToken = await validUser.generateJWTToken()
 
         // PUT JWT token in cookie
-        res.cookie("token", jwtToken, {
-            httpOnly: true,       // prevents JS access
-            secure: false,        // set true if using https
-            sameSite: "lax",
-            path: "/",     // or "none" if cross-site
-            maxAge: 2 * 24 * 60 * 60 * 1000,
+        res.cookie("token", token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production", 
+          sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+          path: "/",
         });
+
 
         return res.status(200).send({status:true,message:"Successfully login!"})
 
