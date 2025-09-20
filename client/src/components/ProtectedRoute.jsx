@@ -3,7 +3,7 @@ import { Navigate } from "react-router-dom";
 import { useSelector,useDispatch } from "react-redux";
 import { setUser } from "../redux/usersSlice";
 function ProtectedRoute({ children }) {
-  const url = "http://localhost:5000"
+  const url = "https://bookmyseat-backend.onrender.com"
   const {user} = useSelector((state)=>state.users)
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
