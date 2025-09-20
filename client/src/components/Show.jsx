@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { Button, Card, Divider, Tag, message } from "antd";
 
 function Show() {
-  const url = "http://localhost:5000"
+  const url = "https://bookmyseat-backend.onrender.com"
   const navigate = useNavigate()
   const user = useSelector((state) => state.users.user);
   const [show, setShow] = useState(null);
