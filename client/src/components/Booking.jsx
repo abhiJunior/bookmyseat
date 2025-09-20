@@ -4,7 +4,7 @@ import { Card, List, Spin, message } from "antd";
 import dayjs from "dayjs";
 
 function Booking() {
-  const url = "http://localhost:5000"
+  const url = "https://bookmyseat-backend.onrender.com"
   const user = useSelector((state) => state.users.user);
   const userId = user._id;
 
