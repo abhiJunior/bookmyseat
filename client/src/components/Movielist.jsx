@@ -5,7 +5,7 @@ import { Spin } from "antd";
 import Corousel from "./Corousel";
 
 function Movielist() {
-  const url = "http://localhost:5000"
+  const url = "https://bookmyseat-backend.onrender.com"
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
