@@ -30,6 +30,7 @@ function classNames(...classes) {
 export default function Home({ children, title }) {
   const url = "https://bookmyseat-backend.onrender.com"
   const user = useSelector((state) => state.users.user);
+  
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -146,8 +147,8 @@ export default function Home({ children, title }) {
               </div>
 
               {/* Mobile menu button */}
-              <div className="-mr-2 flex md:hidden">
-                <DisclosureButton className="group relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-white/5 hover:text-white focus:outline-2 focus:outline-offset-2 focus:outline-indigo-500">
+              <div className="-mr-2 flex md:hidden  ">
+                <DisclosureButton className="group relative inline-flex items-center justify-center rounded-md p-2 text-red-500 hover:bg-white/5 hover:text-white focus:outline-2 focus:outline-offset-2 focus:outline-indigo-500">
                   <Bars3Icon
                     aria-hidden="true"
                     className="block h-6 w-6 group-data-open:hidden"
@@ -193,9 +194,9 @@ export default function Home({ children, title }) {
                 </div>
                 <div className="ml-3">
                   <div className="text-base font-medium text-white">
-                    {user?.name || "Guest"}
+                    {user?.role}
                   </div>
-                  <div className="text-sm font-medium text-gray-400">
+                  <div className="text-sm font-medium text-slate-300">
                     {user?.email || "guest@example.com"}
                   </div>
                 </div>
@@ -207,7 +208,7 @@ export default function Home({ children, title }) {
                       key={item.name}
                       as="button"
                       onClick={handleLogout}
-                      className="block w-full text-left rounded-lg px-6 py-3 text-base font-extrabold text-gray-400 hover:bg-red-600 hover:text-white transition"
+                      className="block w-full text-left rounded-lg px-6 py-3 text-base font-extrabold text-white hover:bg-red-600 hover:text-white transition"
                     >
                       Sign out
                     </DisclosureButton>
@@ -216,7 +217,7 @@ export default function Home({ children, title }) {
                       key={item.name}
                       as={Link}
                       to={item.href}
-                      className="block rounded-lg px-6 py-3 text-base font-extrabold text-gray-400 hover:bg-red-600 hover:text-white transition"
+                      className="block rounded-lg px-6 py-3 text-base font-extrabold text-white hover:bg-red-600 hover:text-white transition"
                     >
                       {item.name}
                     </DisclosureButton>

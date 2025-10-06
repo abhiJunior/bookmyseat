@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import SpinComponent from "./SpinComponent";
 
 export default function SignInPage() {
   const url = "https://bookmyseat-backend.onrender.com";
+  const [loading,setLoading] = useState(false)
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
@@ -31,6 +33,7 @@ export default function SignInPage() {
       setErrors(validationErrors);
     } else {
       setErrors({});
+      setLoading(true)
       try {
         const response = await fetch(`${url}/api/user/login`, {
           method: "POST",
@@ -54,7 +57,12 @@ export default function SignInPage() {
     }
   }, [statusLogin, navigate]);
 
+  if (loading){
+    return <SpinComponent/>
+  }
+
   return (
+    
     <div className="min-h-screen flex items-center justify-center bg-gray-900 p-4 sm:p-6">
       <div className="bg-gray-800 p-6 sm:p-10 rounded-2xl shadow-2xl w-full max-w-md sm:max-w-lg">
         <div className="mb-6 sm:mb-10 flex justify-center">
@@ -129,7 +137,7 @@ export default function SignInPage() {
             new user?
             <Link
             to="/signup"
-            className="hover:underline hover:text-green-400 p-2"
+            className="hover:underline hover:text-green-400 p-2 text-white font-medium"
             >
               Sign Up
             </Link>

@@ -133,7 +133,7 @@ export default function Register() {
           <a href="#" className="hover:underline">
             Forgot Password?
           </a>
-          <Link to="/login" className="hover:underline hover:text-green-400">
+          <Link to="/login" className="hover:underline hover:text-green-400 p-2 text-white font-medium">
             Sign In
           </Link>
         </div>
