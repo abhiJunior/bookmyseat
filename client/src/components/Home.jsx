@@ -37,6 +37,7 @@ export default function Home({ children, title }) {
   // ✅ Logout API call
   const handleLogout = async () => {
     try {
+      localStorage.removeItem("authToken")
       const response = await fetch(`${url}/api/user/logout`, {
         method: "POST",
         credentials: "include",

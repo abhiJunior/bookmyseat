@@ -1,29 +1,31 @@
-import jwt from "jsonwebtoken"
-const isLoggedIn = (req,res,next)=>{
-    try{
-        const {token} = req.cookies // write cookies
-        
-        if (!token){
-            return res.status(401).send("Login is required")
-        }
-        const tokenDetails = jwt.verify(token,process.env.JWT_PASSWORD)
+import jwt from "jsonwebtoken";
 
-        if (!tokenDetails){
-            return res.status(401).send("Login is required")
-        }
+const isLoggedIn = (req, res, next) => {
+  try {
+    // ✅ Get token from "Authorization" header
+    const authHeader = req.headers.authorization;
 
-        req.user = tokenDetails
-        next()
-
-    }catch(e){
-        console.error("authentication erorr",e)
-        return res.status(500).send({"error":e.message})
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({ status: false, message: "Access denied. No token provided." });
     }
 
+    const token = authHeader.split(" ")[1]; // Extract the JWT
 
-    
-    
-    
-}
+    // ✅ Verify token
+    const decoded = jwt.verify(token, process.env.JWT_PASSWORD);
 
-export default isLoggedIn
+    if (!decoded) {
+      return res.status(401).json({ status: false, message: "Invalid token." });
+    }
+
+    // ✅ Attach user info to request
+    req.user = decoded;
+
+    next(); // Continue to controller
+  } catch (e) {
+    console.error("Authentication error:", e.message);
+    return res.status(401).json({ status: false, message: "Unauthorized" });
+  }
+};
+
+export default isLoggedIn;

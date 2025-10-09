@@ -4,13 +4,14 @@ import SpinComponent from "./SpinComponent";
 
 export default function SignInPage() {
   const url = "https://bookmyseat-backend.onrender.com";
-  const [loading,setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
-  const [statusLogin, setstatuslogin] = useState(null);
+  const [statusLogin, setStatusLogin] = useState(null);
   const navigate = useNavigate();
 
+  // ✅ Basic validation
   const validate = () => {
     const errs = {};
     if (!email) {
@@ -26,43 +27,55 @@ export default function SignInPage() {
     return errs;
   };
 
+  // ✅ Handle login
   const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validate();
     if (Object.keys(validationErrors).length) {
       setErrors(validationErrors);
-    } else {
-      setErrors({});
-      setLoading(true)
-      try {
-        const response = await fetch(`${url}/api/user/login`, {
-          method: "POST",
-          body: JSON.stringify({ email, password }),
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-        });
-        const res = await response.json();
-        setstatuslogin({ status: res.status, message: res.message });
-      } catch (e) {
-        alert("Login Failed", e.message);
+      return;
+    }
+
+    setErrors({});
+    setLoading(true);
+
+    try {
+      const response = await fetch(`${url}/api/user/login`, {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+        headers: { "Content-Type": "application/json" },
+      });
+
+      const res = await response.json();
+      setStatusLogin({ status: res.status, message: res.message });
+
+      if (res.status && res.token) {
+        // ✅ Save token in localStorage
+        console.log("token",res.token)
+        localStorage.setItem("authToken", res.token);
+        // Optional: store user info
+        navigate("/");
+      } else {
+        console.log(res)
+        console.warn("Login failed:", res.message);
       }
+    } catch (err) {
+      alert("Login failed. Please try again later.");
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
+  // ✅ Auto-redirect if already logged in
   useEffect(() => {
-    if (statusLogin) {
-      if (statusLogin.status) {
-        navigate("/");
-      }
-    }
-  }, [statusLogin, navigate]);
+    const token = localStorage.getItem("authToken");
+    if (token) navigate("/");
+  }, [navigate]);
 
-  if (loading){
-    return <SpinComponent/>
-  }
+  if (loading) return <SpinComponent />;
 
   return (
-    
     <div className="min-h-screen flex items-center justify-center bg-gray-900 p-4 sm:p-6">
       <div className="bg-gray-800 p-6 sm:p-10 rounded-2xl shadow-2xl w-full max-w-md sm:max-w-lg">
         <div className="mb-6 sm:mb-10 flex justify-center">
@@ -70,7 +83,9 @@ export default function SignInPage() {
             BookMySeat
           </span>
         </div>
+
         <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
+          {/* Email Field */}
           <div>
             <label
               htmlFor="email"
@@ -87,11 +102,13 @@ export default function SignInPage() {
               onChange={(e) => setEmail(e.target.value)}
             />
             {errors.email && (
-              <div className="text-red-400 text-sm sm:text-base mt-2">
+              <p className="text-red-400 text-sm sm:text-base mt-2">
                 {errors.email}
-              </div>
+              </p>
             )}
           </div>
+
+          {/* Password Field */}
           <div>
             <label
               htmlFor="password"
@@ -108,17 +125,20 @@ export default function SignInPage() {
               onChange={(e) => setPassword(e.target.value)}
             />
             {errors.password && (
-              <div className="text-red-400 text-sm sm:text-base mt-2">
+              <p className="text-red-400 text-sm sm:text-base mt-2">
                 {errors.password}
-              </div>
+              </p>
             )}
           </div>
+
+          {/* Submit Button */}
           <button
             type="submit"
             className="w-full py-3 sm:py-4 rounded-lg bg-red-600 text-white text-lg sm:text-xl font-bold cursor-pointer hover:bg-red-700 transition"
           >
             Sign In
           </button>
+
           {statusLogin && (
             <p
               className={`mt-2 text-sm sm:text-lg ${
@@ -129,20 +149,21 @@ export default function SignInPage() {
             </p>
           )}
         </form>
+
+        {/* Footer Links */}
         <div className="flex justify-between text-xs sm:text-sm text-gray-400 mt-6">
           <a href="#" className="hover:underline">
             Forgot Password?
           </a>
           <span>
-            new user?
+            New user?
             <Link
-            to="/signup"
-            className="hover:underline hover:text-green-400 p-2 text-white font-medium"
+              to="/signup"
+              className="hover:underline hover:text-green-400 p-2 text-white font-medium"
             >
               Sign Up
             </Link>
           </span>
-          
         </div>
       </div>
     </div>

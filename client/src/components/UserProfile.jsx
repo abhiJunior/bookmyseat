@@ -21,6 +21,8 @@ export default function UserProfile() {
 
   const handleLogout = async () => {
     try {
+
+      localStorage.removeItem("authToken")
       const response = await fetch(`${url}/api/user/logout`, {
         method: "POST",
         credentials: "include",

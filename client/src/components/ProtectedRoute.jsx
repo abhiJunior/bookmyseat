@@ -1,35 +1,51 @@
 import React, { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
-import { useSelector,useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { setUser } from "../redux/usersSlice";
+
 function ProtectedRoute({ children }) {
-  const url = "https://bookmyseat-backend.onrender.com"
-  const {user} = useSelector((state)=>state.users)
+  const url = "https://bookmyseat-backend.onrender.com";
+  const { user } = useSelector((state) => state.users);
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
 
   const checkAuth = async () => {
     try {
+      const token = localStorage.getItem("authToken");
+
+      if (!token) {
+        console.warn("❌ No token found — user not logged in");
+        setAuthenticated(false);
+        dispatch(setUser(null));
+        setLoading(false);
+        return;
+      }
+
       const response = await fetch(`${url}/api/user/profile`, {
-        method: "GET", // ✅ fix casing
-        credentials: "include", // ✅ ensures cookies are sent
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // ✅ use Bearer token from localStorage
+        },
       });
 
       if (response.ok) {
-        const data = await response.json()
-        dispatch(setUser(data))
-        console.log("✅ Authenticated user");
+        const data = await response.json();
+        dispatch(setUser(data));
+        console.log("✅ Authenticated user:", data);
         setAuthenticated(true);
       } else {
-        console.log("❌ Not authenticated:", response.status);
+        console.warn("❌ Token invalid or expired:", response.status);
+        localStorage.removeItem("authToken");
+        dispatch(setUser(null));
         setAuthenticated(false);
-        dispatch(setUser(null))
       }
-    } catch (e) {
-      console.log("⚠️ Auth check failed", e);
+    } catch (error) {
+      console.error("⚠️ Auth check failed:", error);
+      localStorage.removeItem("authToken");
+      dispatch(setUser(null));
       setAuthenticated(false);
-      dispatch(setUser(null))
     } finally {
       setLoading(false);
     }
@@ -40,7 +56,11 @@ function ProtectedRoute({ children }) {
   }, []);
 
   if (loading) {
-    return <p>Loading...</p>;
+    return (
+      <div className="flex justify-center items-center h-screen text-gray-200 text-lg">
+        Checking authentication...
+      </div>
+    );
   }
 
   return authenticated ? children : <Navigate to="/login" />;

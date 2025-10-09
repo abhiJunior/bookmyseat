@@ -23,6 +23,7 @@ export const createUser = async(req,res)=>{
 
 export const login = async(req,res)=>{
     const {email , password } = req.body
+    console.log("its getting call or not")
     try{
         const validUser = await User.findOne({email:email.toLowerCase()}).select("+password")
 
@@ -38,15 +39,24 @@ export const login = async(req,res)=>{
         const jwtToken = await validUser.generateJWTToken()
 
         // PUT JWT token in cookie
-        res.cookie("token", jwtToken, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production", 
-          sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
-          path: "/",
-        });
+        // res.cookie("token", jwtToken, {
+        //   httpOnly: true,
+        //   secure: process.env.NODE_ENV === "production", 
+        //   sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+        //   path: "/",
+        // });
 
-
-        return res.status(200).send({status:true,message:"Successfully login!"})
+        
+        return res.status(200).send({
+            status:true,
+            message:"Successfully login!",
+            token : jwtToken,
+            user:{
+                id :validUser._id,
+                name: validUser.name,
+                email: validUser.email
+            }
+        })
 
     }catch(e){
         res.status(500).send(e.message)
@@ -55,6 +65,7 @@ export const login = async(req,res)=>{
 
 export const profile = async(req,res)=>{
     const userId = req.user.id
+    
     try{
         
         const userDetail = await User.findById(userId)
@@ -66,13 +77,7 @@ export const profile = async(req,res)=>{
 }
 
 export const logout = (req, res) => {
-  res.clearCookie("token", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",   // must match login
-    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
-    path: "/",                                       // must also match
-  });
-
+  
   return res
     .status(200)
     .send({ status: true, message: "Successfully logged out!" });
