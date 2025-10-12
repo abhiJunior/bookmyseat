@@ -31,8 +31,13 @@ const ShowTable = () => {
   // Fetch shows
   const fetchShows = async () => {
     try {
+      const token = localStorage.getItem("authToken")
       const response = await fetch(`${url}/api/show/all`, {
         method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // ✅ use Bearer token from localStorage
+        },
         credentials: "include",
       });
       if (!response.ok) throw new Error("Failed to fetch shows");
@@ -46,9 +51,15 @@ const ShowTable = () => {
 
   // Fetch movies
   const fetchMovies = async () => {
+
     try {
+      const token = localStorage.getItem("authToken")
       const response = await fetch(`${url}/api/movie/list`, {
         method: "GET",
+        headers:{
+            Authorization : `Bearer ${token}`,
+            "Content-Type": "application/json"
+        },
         credentials: "include",
       });
       const data = await response.json();
@@ -62,8 +73,13 @@ const ShowTable = () => {
   // Fetch theatres
   const fetchTheatres = async () => {
     try {
+      const token = localStorage.getItem("authToken")
       const response = await fetch(`${url}/api/theatre`, {
         method: "GET",
+        headers:{
+            Authorization : `Bearer ${token}`,
+            "Content-Type": "application/json"
+          },
         credentials: "include",
       });
       const data = await response.json();
@@ -153,9 +169,15 @@ const ShowTable = () => {
 
   // Delete Show
   const handleDelete = async (id) => {
+    const token = localStorage.getItem("authToken")
     try {
       const response = await fetch(`${url}/api/show/${id}`, {
         method: "DELETE",
+        headers:{
+          Authorization : `Bearer ${token}`,
+          "Content-Type": "application/json"
+          
+        },
         credentials: "include",
       });
       if (response.ok) {
@@ -172,6 +194,7 @@ const ShowTable = () => {
 
   // Form submit handler
   const handleFinish = async (values) => {
+    const token = localStorage.getItem("authToken")
     try {
       const payload = {
         ...values,
@@ -186,7 +209,11 @@ const ShowTable = () => {
 
       const response = await fetch(urlEndpoint, {
         method,
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          Authorization : `Bearer ${token}`,
+
+        },
         credentials: "include",
         body: JSON.stringify(payload),
       });

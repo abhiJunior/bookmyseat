@@ -22,6 +22,7 @@ export const getTheatres = async(req,res)=>{
 
 export const createTheatre = async(req,res)=>{
     try{
+        console.log("Theatre",req.body)
         const resopnse = await Theatre.create(req.body)
         res.status(201).send({status:true,message:"created sucessfully",data:resopnse})
     }catch(e){

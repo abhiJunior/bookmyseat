@@ -65,6 +65,7 @@ export const login = async(req,res)=>{
 
 export const profile = async(req,res)=>{
     const userId = req.user.id
+    console.log("getProfile not working?")
     
     try{
         
@@ -72,6 +73,7 @@ export const profile = async(req,res)=>{
         
         res.status(200).send(userDetail)
     }catch(e){
+        
         res.status(500).send(e.message)
     }
 }

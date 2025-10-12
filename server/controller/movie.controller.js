@@ -1,8 +1,11 @@
 import Movie from "../model/movie.model.js"
 import Theatre from "../model/theatre.model.js"
+
+// creating a new movie
 export const createMovie = async(req,res)=>{
     try{
         const movieData = req.body
+        console.log("movieData",movieData)
         
         let theatre_id = await Theatre.findById(movieData.theatre)
         console.log("getting theatreId :",theatre_id)

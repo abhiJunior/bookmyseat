@@ -1,16 +1,47 @@
 import mongoose from "mongoose";
 import Show from "../model/show.model.js";
 
-export const  createShow = async(req,res)=>{
-    const showDeatail = req.body;
-    try{
-        const response = await Show.create(showDeatail);
-        return res.status(201).send(response)
-    }catch(e){
-        console.error("erorr on creating",e)
-        return res.status(500).send({erorr:e.message})
-    }
-}
+export const createShow = async (req, res) => {
+  try {
+    const showDetails = req.body;
+
+    // 🪑 Define seat categories and pricing
+    const seatCategories = [
+      { category: "Gold", price: 240, rowLabel: "A" },
+      { category: "Silver", price: 140, rowLabel: "B" },
+    ];
+
+    // 🎟️ Generate seating arrangement for each category
+    const generatedSeats = seatCategories.map((cat) => {
+      const row = [];
+      for (let i = 1; i <= 8; i++) {
+        row.push({
+          seatNumber: `${i}${cat.rowLabel}`, // 1A, 2A, ..., 8B
+          status: "Available",
+        });
+      }
+
+      return {
+        category: cat.category,
+        price: cat.price,
+        arrangements: [row], // nested 2D structure
+      };
+    });
+
+    // 🎬 Create show with generated seating arrangement
+    const newShow = await Show.create({
+      ...showDetails,
+      totalseats: 8,
+      availableseats: 8,
+      seats: generatedSeats,
+    });
+
+    return res.status(201).json(newShow);
+  } catch (error) {
+    console.error("Error creating show:", error);
+    return res.status(500).json({ error: error.message });
+  }
+};
 
 export const getShows = async(req,res)=>{
     

@@ -7,10 +7,15 @@ export default function UserProfile() {
   const [user, setUser] = useState({});
 
   const getProfile = async () => {
+    const token = localStorage.getItem("authToken")
     const response = await fetch(`${url}/api/user/profile`, {
       method: "GET",
-      credentials: "include", // send cookies
+      headers:{
+        Authorization : `Bearer ${token}`,
+        "Conten-Type": "application/json"
+      }
     });
+    console.log(response)
     if (!response.ok) {
       console.error("Failed to fetch profile:", response.statusText);
       return;

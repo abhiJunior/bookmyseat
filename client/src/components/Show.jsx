@@ -15,8 +15,13 @@ function Show() {
 
   const fetchShow = async () => {
     try {
+      const token = localStorage.getItem("authToken")
       const response = await fetch(`${url}/api/show/${showId}`, {
         method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // ✅ use Bearer token from localStorage
+        },
         credentials: "include",
       });
       const res = await response.json();

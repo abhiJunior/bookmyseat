@@ -18,6 +18,7 @@ const { Option } = Select;
 const MovieTable = () => {
   const url = "https://bookmyseat-backend.onrender.com";
   const [movies, setMovies] = useState([]);
+  const [theatres,setTheatres] = useState([])
   const [editing, setEditing] = useState(false);
   const [editingMovieId, setEditingMovieId] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -29,8 +30,13 @@ const MovieTable = () => {
   // Fetch movies from backend
   const fetchMovies = async () => {
     try {
+      const token = localStorage.getItem("authToken");
       const response = await fetch(`${url}/api/movie/list`, {
         method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // ✅ use Bearer token from localStorage
+        },
         credentials: "include",
       });
       if (!response.ok) {
@@ -43,9 +49,29 @@ const MovieTable = () => {
       messageApi.error("Failed to load movies ❌");
     }
   };
+  const fetchTheatres = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+      const response = await fetch(`${url}/api/theatre/`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch theatres");
+      const data = await response.json();
+      setTheatres(data);
+    } catch (error) {
+      console.error("Error fetching theatres:", error);
+      messageApi.error("Failed to load theatres ❌");
+    }
+  };
 
   useEffect(() => {
     fetchMovies();
+    fetchTheatres();
   }, []);
 
   // Table Columns with description trimming style
@@ -132,9 +158,14 @@ const MovieTable = () => {
 
   // Handle Delete
   const handleDelete = async (id) => {
+    const token = localStorage.getItem("authToken");
     try {
       const response = await fetch(`${url}/api/movie/${id}`, {
         method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Conten-Type": "application/json",
+        },
         credentials: "include",
       });
       if (response.ok) {
@@ -153,17 +184,24 @@ const MovieTable = () => {
   const handleMovie = async (values) => {
     try {
       let response;
+      const token = localStorage.getItem("authToken");
       if (editing) {
         response = await fetch(`${url}/api/movie/${editingMovieId}`, {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
           credentials: "include",
           body: JSON.stringify(values),
         });
       } else {
         response = await fetch(`${url}/api/movie/`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
           credentials: "include",
           body: JSON.stringify(values),
         });
@@ -171,7 +209,9 @@ const MovieTable = () => {
 
       if (response.ok) {
         messageApi.success(
-          editing ? "Movie updated successfully ✅" : "Movie added successfully ✅"
+          editing
+            ? "Movie updated successfully ✅"
+            : "Movie added successfully ✅"
         );
         setIsModalVisible(false);
         form.resetFields();
@@ -226,7 +266,9 @@ const MovieTable = () => {
             </div>
             <div className="text-sm mb-1">
               <strong>Release Date:</strong>{" "}
-              {movie.releaseDate ? new Date(movie.releaseDate).toLocaleDateString() : "-"}
+              {movie.releaseDate
+                ? new Date(movie.releaseDate).toLocaleDateString()
+                : "-"}
             </div>
             <div className="text-sm mb-3">
               <strong>Languages:</strong> {movie.languages?.join(", ")}
@@ -341,7 +383,13 @@ const MovieTable = () => {
             name="theatre"
             rules={[{ required: true, message: "Theatre is required" }]}
           >
-            <Input placeholder="Theatre ID" />
+            <Select placeholder="Select a Theatre" allowClear>
+              {theatres.map((theatre) => (
+                <Option key={theatre._id} value={theatre._id}>
+                  {theatre.name} ({theatre.location})
+                </Option>
+              ))}
+            </Select>
           </Form.Item>
 
           <Form.Item>

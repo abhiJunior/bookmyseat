@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Table, Space, Button, Modal, Form, Input, message } from "antd";
+import { ListConsumer } from "antd/es/list/context";
 
 const TheatreTable = () => {
-  const url = "https://bookmyseat-backend.onrender.com";
+  const url = "http://localhost:5000";
   const [theatre, setTheatre] = useState([]);
   const [editing, setEditing] = useState(false);
   const [editingTheatreId, setEditingTheatreId] = useState(null);
@@ -15,8 +16,13 @@ const TheatreTable = () => {
   // Fetch theatres
   const fetchTheatre = async () => {
     try {
+      const token = localStorage.getItem("authToken")
       const response = await fetch(`${url}/api/theatre`, {
         method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // ✅ use Bearer token from localStorage
+        },
         credentials: "include",
       });
       if (!response.ok) throw new Error("Failed to fetch theatre");
@@ -78,8 +84,13 @@ const TheatreTable = () => {
   // Delete theatre
   const handleDelete = async (id) => {
     try {
+      const token = localStorage.getItem("authToken")
       const response = await fetch(`${url}/api/theatre/${id}`, {
         method: "DELETE",
+        headers:{
+            Authorization : `Bearer ${token}`,
+            "Content-Type": "application/json"
+        },
         credentials: "include",
       });
       if (response.ok) {
@@ -97,6 +108,7 @@ const TheatreTable = () => {
   // Add / Update theatre
   const handleSubmit = async (values) => {
     try {
+      const token = localStorage.getItem("authToken")
       let urlEndpoint = `${url}/api/theatre/`;
       let method = "POST";
 
@@ -107,7 +119,10 @@ const TheatreTable = () => {
 
       const response = await fetch(urlEndpoint, {
         method,
-        headers: { "Content-Type": "application/json" },
+        headers:{
+            Authorization : `Bearer ${token}`,
+            "Content-Type": "application/json"
+        },
         credentials: "include",
         body: JSON.stringify(values),
       });
